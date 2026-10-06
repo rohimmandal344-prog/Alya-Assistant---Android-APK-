@@ -375,7 +375,7 @@ class AuthManager(private val context: Context) {
             msg.contains("operation is not allowed", ignoreCase = true) ||
             msg.contains("disabled for this Firebase project", ignoreCase = true) ||
             msg.contains("ERROR_OPERATION_NOT_ALLOWED", ignoreCase = true) -> {
-                "This sign-in method (Email or Phone) is currently disabled in your Firebase console. Please tap 'Continue with Google' above or 'Continue as Guest'."
+                "This authentication provider is currently disabled in your Firebase console. Go to console.firebase.google.com -> Build -> Authentication -> Sign-in method, then enable the 'Phone' or 'Email/Password' provider to authorize this sign-in method."
             }
             msg.contains("password is invalid", ignoreCase = true) || msg.contains("wrong password", ignoreCase = true) -> {
                 "Incorrect password. Please verify and try again."

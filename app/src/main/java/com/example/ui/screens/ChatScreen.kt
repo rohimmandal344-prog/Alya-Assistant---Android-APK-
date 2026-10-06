@@ -271,12 +271,15 @@ fun ChatScreen(
             }
         }
 
-        // Bottom Input Row (Soft Keyboard Adaptive - imePadding & navigationBarsPadding)
+        // Bottom Input Row (Soft Keyboard Adaptive - Perfectly docked above IME without black gaps)
+        val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+        val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
         Surface(
-            tonalElevation = 3.dp,
+            tonalElevation = 4.dp,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
                 .imePadding()
         ) {
             Row(
@@ -295,9 +298,25 @@ fun ChatScreen(
                     shape = RoundedCornerShape(24.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
-                    maxLines = 4
+                    maxLines = 4,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Send
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onSend = {
+                            val text = textInput.trim()
+                            if (text.isNotEmpty()) {
+                                onSendMessage(text)
+                                textInput = ""
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+                            }
+                        }
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -329,6 +348,8 @@ fun ChatScreen(
                         if (text.isNotEmpty()) {
                             onSendMessage(text)
                             textInput = ""
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
                         }
                     },
                     modifier = Modifier.testTag("send_button")

@@ -58,7 +58,7 @@ class PreferencesManager(private val context: Context) {
     }
 
     val aiModel: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[KEY_AI_MODEL] ?: "gemini-3.5-flash"
+        prefs[KEY_AI_MODEL] ?: "gemini-2.5-flash"
     }
 
     val thinkingLevel: Flow<String> = context.dataStore.data.map { prefs ->

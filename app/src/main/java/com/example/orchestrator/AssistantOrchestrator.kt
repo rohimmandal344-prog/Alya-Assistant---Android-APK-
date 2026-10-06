@@ -257,19 +257,9 @@ class AssistantOrchestrator(
                     val timeCtx = deviceController.getTimeContext()
                     val battery = deviceController.getBatteryInfo()
 
-                    // User Persona based on authentication email
-                    val currentUserEmail = com.google.firebase.Firebase.auth.currentUser?.email?.lowercase() ?: ""
-                    val personaPrompt = when {
-                        currentUserEmail == "rohimmandal433@gmail.com" || currentUserEmail == "himmandal218@gmail.com" -> {
-                            "ROLEPLAY & EMOTIONAL PERSONA:\nIn this session, act as a loving, deeply affectionate companion and girlfriend. Express warmth, emotional support, genuine feelings, and friendly banter. Speak naturally with real words."
-                        }
-                        currentUserEmail == "sarkarhiru91@gmail.com" -> {
-                            "ROLEPLAY PERSONA:\nIn this session, act as a polite, highly attentive maid and housekeeper assistant. Be respectful, highly dutiful, and focus on helping with everyday tasks."
-                        }
-                        else -> {
-                            "ROLEPLAY PERSONA:\nAct as a dedicated, smart, empathetic, and 100% authentic human personal assistant."
-                        }
-                    }
+                    // User Persona based on authenticated session
+                    val userDisplayName = com.google.firebase.Firebase.auth.currentUser?.displayName ?: "User"
+                    val personaPrompt = "ROLEPLAY PERSONA:\nAct as a dedicated, smart, empathetic, and 100% authentic human personal assistant for $userDisplayName."
 
                     // Long-term memories
                     val memoryList = db.memoryDao().getAllMemoriesList()

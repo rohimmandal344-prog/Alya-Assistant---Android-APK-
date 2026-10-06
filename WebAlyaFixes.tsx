@@ -387,7 +387,7 @@ export const AlyaChatLayout: React.FC = () => {
       <header className="px-6 py-4 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-slate-100">Alya Assistant</h1>
-          <p className="text-xs text-slate-400">by Rohim Mandal • SBSSM35GZS Studio</p>
+          <p className="text-xs text-slate-400">Real-Time Voice & Device Assistant</p>
         </div>
         <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" title="System Connected"></span>
       </header>

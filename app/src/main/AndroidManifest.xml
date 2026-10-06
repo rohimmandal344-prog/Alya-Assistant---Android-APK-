@@ -109,6 +109,11 @@
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
+        <!-- Background Audio Pre-Warming Service -->
+        <service
+            android:name=".service.AlyaAudioPrewarmService"
+            android:exported="false" />
+
         <!-- User-authorized Accessibility Automation Service -->
         <service
             android:name=".device.AlyaAutomationService"

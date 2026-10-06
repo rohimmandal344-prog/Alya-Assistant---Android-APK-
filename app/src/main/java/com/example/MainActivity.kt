@@ -9,7 +9,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
@@ -212,12 +214,14 @@ fun AlyaApp(
         onSelectTab(AppTab.CHAT)
     }
 
+    val isKeyboardOpen = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            // Hide bottom bar during immersive live voice session
-            AnimatedVisibility(visible = state.selectedTab != AppTab.LIVE_VOICE) {
+            // Hide bottom bar during immersive live voice session or when typing in Chat
+            AnimatedVisibility(visible = state.selectedTab != AppTab.LIVE_VOICE && !(state.selectedTab == AppTab.CHAT && isKeyboardOpen)) {
                 NavigationBar(
                     modifier = Modifier.testTag("bottom_nav_bar")
                 ) {

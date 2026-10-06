@@ -74,7 +74,7 @@ data class AlyaUiState(
     val permissions: PermissionState = PermissionState(),
     val logs: List<LogEntry> = emptyList(),
     val errorMessage: String? = null,
-    val aiModel: String = "gemini-3.5-flash",
+    val aiModel: String = "gemini-2.5-flash",
     val thinkingLevel: String = "low",
     val voicePitch: Float = 1.05f,
     val voiceSpeed: Float = 1.0f,

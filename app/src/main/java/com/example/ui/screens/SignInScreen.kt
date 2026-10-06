@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
@@ -61,6 +62,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -171,7 +173,7 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "by Rohim Mandal • SBSSM35GZS Studio",
+                    text = "Smart AI Voice & Device Assistant",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
@@ -343,9 +345,12 @@ fun SignInScreen(
                                         value = phoneName,
                                         onValueChange = { phoneName = it },
                                         label = { Text("Your Full Name") },
-                                        placeholder = { Text("Full Name") },
                                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                                         singleLine = true,
+                                        keyboardOptions = KeyboardOptions(
+                                            autoCorrect = false,
+                                            keyboardType = KeyboardType.Text
+                                        ),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("phone_name_input")
@@ -357,9 +362,12 @@ fun SignInScreen(
                                         value = phoneNumber,
                                         onValueChange = { phoneNumber = it },
                                         label = { Text("Phone Number (with Country Code)") },
-                                        placeholder = { Text("+1 555 123 4567") },
                                         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
                                         singleLine = true,
+                                        keyboardOptions = KeyboardOptions(
+                                            autoCorrect = false,
+                                            keyboardType = KeyboardType.Phone
+                                        ),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("phone_number_input")
@@ -531,9 +539,12 @@ fun SignInScreen(
                                         value = manualName,
                                         onValueChange = { manualName = it },
                                         label = { Text("Full Name") },
-                                        placeholder = { Text("Full Name") },
                                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                                         singleLine = true,
+                                        keyboardOptions = KeyboardOptions(
+                                            autoCorrect = false,
+                                            keyboardType = KeyboardType.Text
+                                        ),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("manual_name_input")
@@ -546,9 +557,12 @@ fun SignInScreen(
                                     value = manualEmail,
                                     onValueChange = { manualEmail = it },
                                     label = { Text("Email Address") },
-                                    placeholder = { Text("name@example.com") },
                                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                                     singleLine = true,
+                                    keyboardOptions = KeyboardOptions(
+                                        autoCorrect = false,
+                                        keyboardType = KeyboardType.Email
+                                    ),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .testTag("manual_email_input")
@@ -563,6 +577,10 @@ fun SignInScreen(
                                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                                     visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                                     singleLine = true,
+                                    keyboardOptions = KeyboardOptions(
+                                        autoCorrect = false,
+                                        keyboardType = KeyboardType.Password
+                                    ),
                                     trailingIcon = {
                                         IconButton(onClick = { showPassword = !showPassword }) {
                                             Icon(
@@ -586,6 +604,10 @@ fun SignInScreen(
                                         leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                                         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                                         singleLine = true,
+                                        keyboardOptions = KeyboardOptions(
+                                            autoCorrect = false,
+                                            keyboardType = KeyboardType.Password
+                                        ),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("manual_confirm_password_input")

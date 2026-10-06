@@ -62,20 +62,23 @@ jobs:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 || secrets.KEYSTORE_BASE64 }}
           STORE_PASSWORD_SECRET: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD_SECRET: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS_SECRET: ${{ secrets.KEY_ALIAS }}
         run: |
           STORE_PASS="${STORE_PASSWORD_SECRET:-alya_release_pwd_2026}"
           KEY_PASS="${KEY_PASSWORD_SECRET:-alya_release_pwd_2026}"
+          ALIAS_NAME="${KEY_ALIAS_SECRET:-upload}"
 
           if [ -n "$RELEASE_KEYSTORE_BASE64" ]; then
             echo "Decoding release keystore from repository secrets..."
             echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > my-upload-key.jks
           elif [ ! -f "my-upload-key.jks" ]; then
             echo "Generating production release signing key..."
-            keytool -genkeypair -v -keystore my-upload-key.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 -storepass "$STORE_PASS" -keypass "$KEY_PASS" -dname "CN=Alya Assistant,OU=Mobile,O=Alya,C=US"
+            keytool -genkeypair -v -keystore my-upload-key.jks -alias "$ALIAS_NAME" -keyalg RSA -keysize 2048 -validity 10000 -storepass "$STORE_PASS" -keypass "$KEY_PASS" -dname "CN=Alya Assistant,OU=Mobile,O=Alya,C=US"
           fi
 
           echo "STORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
           echo "KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+          echo "KEY_ALIAS=$ALIAS_NAME" >> $GITHUB_ENV
           echo "KEYSTORE_PATH=${GITHUB_WORKSPACE}/my-upload-key.jks" >> $GITHUB_ENV
           ls -lh my-upload-key.jks
 
@@ -99,6 +102,7 @@ jobs:
         env:
           STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
           KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m"
         run: |

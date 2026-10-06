@@ -48,12 +48,20 @@ class SpeechRecognizerHelper(
                 setRecognitionListener(this@SpeechRecognizerHelper)
             }
 
+            val langTag = if (currentLanguage.isBlank() || currentLanguage.equals("auto", ignoreCase = true)) {
+                Locale.getDefault().toLanguageTag()
+            } else {
+                currentLanguage
+            }
+
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, currentLanguage)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, currentLanguage)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, langTag)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, langTag)
+                putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, false)
+                putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, arrayListOf("hi-IN", "en-IN", "en-US", "bn-IN", "es-ES", "fr-FR"))
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
                 putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
             }
 

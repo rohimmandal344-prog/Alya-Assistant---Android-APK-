@@ -31,7 +31,7 @@ class GeminiApiClient {
     suspend fun generateStructuredResponse(
         prompt: String,
         history: List<Pair<String, String>> = emptyList(),
-        model: String = "gemini-3.5-flash",
+        model: String = "gemini-2.5-flash",
         systemContext: String = "",
         customApiKey: String? = null,
         enableThinking: Boolean = false,
@@ -53,7 +53,10 @@ class GeminiApiClient {
             )
         }
 
-        val cleanModel = model.removePrefix("models/")
+        var cleanModel = model.removePrefix("models/")
+        if (cleanModel.contains("gemini-3.")) {
+            cleanModel = "gemini-2.5-flash"
+        }
 
         val primaryResult = executeGeminiRequest(
             apiKey = apiKey,
@@ -72,10 +75,10 @@ class GeminiApiClient {
         val error = primaryResult.exceptionOrNull()
         AlyaLogger.w(TAG, "Primary request failed (${error?.javaClass?.simpleName}: ${error?.message}). Attempting fast fallback...")
 
-        if (cleanModel != "gemini-3.1-flash-lite-preview") {
+        if (cleanModel != "gemini-2.0-flash") {
             val fallbackResult = executeGeminiRequest(
                 apiKey = apiKey,
-                model = "gemini-3.1-flash-lite-preview",
+                model = "gemini-2.0-flash",
                 prompt = prompt,
                 history = history.takeLast(2),
                 systemContext = systemContext,
@@ -101,7 +104,7 @@ class GeminiApiClient {
     suspend fun generateResponse(
         prompt: String,
         history: List<Pair<String, String>> = emptyList(),
-        model: String = "gemini-3.5-flash",
+        model: String = "gemini-2.5-flash",
         systemContext: String = "",
         customApiKey: String? = null,
         enableThinking: Boolean = false,
