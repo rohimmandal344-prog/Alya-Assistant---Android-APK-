@@ -50,6 +50,8 @@ class SpeechRecognizerHelper(
 
             val langTag = if (currentLanguage.isBlank() || currentLanguage.equals("auto", ignoreCase = true)) {
                 Locale.getDefault().toLanguageTag()
+            } else if (currentLanguage.equals("rjs-IN", ignoreCase = true) || currentLanguage.equals("bn-BD", ignoreCase = true)) {
+                "bn-IN"
             } else {
                 currentLanguage
             }

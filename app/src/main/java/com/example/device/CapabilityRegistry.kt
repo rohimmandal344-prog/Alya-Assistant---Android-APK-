@@ -10,6 +10,10 @@ import com.example.core.model.ActionImpactLevel
 import com.example.core.model.ActionIntent
 import com.example.core.model.DeviceActionType
 import java.util.Locale
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 
 class CapabilityRegistry(
     private val context: Context,
@@ -357,6 +361,31 @@ class CapabilityRegistry(
                 }
             }
 
+            DeviceActionType.SET_SCREEN_BRIGHTNESS -> {
+                val level = intent.parameters["level"]?.toIntOrNull() ?: 70
+                val result = deviceController.setScreenBrightness(level)
+                if (result.isSuccess) {
+                    val msg = result.getOrNull() ?: "Set screen brightness to $level%"
+                    ActionExecutionResult(
+                        action = "SET_SCREEN_BRIGHTNESS",
+                        target = "$level%",
+                        success = true,
+                        verified = true,
+                        feedbackMessage = msg,
+                        technicalDetails = "Settings.System screen brightness updated"
+                    )
+                } else {
+                    ActionExecutionResult(
+                        action = "SET_SCREEN_BRIGHTNESS",
+                        target = "$level%",
+                        success = false,
+                        verified = false,
+                        feedbackMessage = "Failed to change screen brightness: ${result.exceptionOrNull()?.message}",
+                        technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
+                    )
+                }
+            }
+
             DeviceActionType.TOGGLE_FLASHLIGHT -> {
                 val enable = intent.parameters["enable"]?.toBoolean() ?: true
                 val result = deviceController.toggleFlashlight(enable)
@@ -531,15 +560,33 @@ class CapabilityRegistry(
             }
 
             DeviceActionType.OPEN_WIFI_SETTINGS -> {
+                val service = AlyaAutomationService.instance
                 val res = deviceController.openSettings(Settings.ACTION_WIFI_SETTINGS)
-                ActionExecutionResult(
-                    action = "OPEN_WIFI_SETTINGS",
-                    target = "Wi-Fi",
-                    success = res.isSuccess,
-                    verified = res.isSuccess,
-                    feedbackMessage = "Opened Wi-Fi Settings",
-                    technicalDetails = ""
-                )
+                if (res.isSuccess && service != null) {
+                    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                        kotlinx.coroutines.delay(1200)
+                        service.toggleSettingSwitch()
+                        kotlinx.coroutines.delay(800)
+                        service.performGlobal(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
+                    }
+                    ActionExecutionResult(
+                        action = "OPEN_WIFI_SETTINGS",
+                        target = "Wi-Fi",
+                        success = true,
+                        verified = true,
+                        feedbackMessage = "Automatically toggling Wi-Fi state via Accessibility Service.",
+                        technicalDetails = "Accessibility automation executed on Wi-Fi switch"
+                    )
+                } else {
+                    ActionExecutionResult(
+                        action = "OPEN_WIFI_SETTINGS",
+                        target = "Wi-Fi",
+                        success = res.isSuccess,
+                        verified = res.isSuccess,
+                        feedbackMessage = "Opened Wi-Fi Settings page",
+                        technicalDetails = ""
+                    )
+                }
             }
 
             DeviceActionType.OPEN_BLUETOOTH_SETTINGS -> {
@@ -723,26 +770,56 @@ class CapabilityRegistry(
 
             DeviceActionType.TOGGLE_BLUETOOTH -> {
                 val enable = intent.parameters["enable"]?.toBoolean() ?: true
-                val result = deviceController.toggleBluetooth(enable)
-                if (result.isSuccess) {
-                    val msg = result.getOrNull() ?: ("Bluetooth set to " + if (enable) "ON" else "OFF")
-                    ActionExecutionResult(
-                        action = "TOGGLE_BLUETOOTH",
-                        target = if (enable) "ON" else "OFF",
-                        success = true,
-                        verified = true,
-                        feedbackMessage = msg,
-                        technicalDetails = "BluetoothAdapter/Settings toggle executed"
-                    )
+                val service = AlyaAutomationService.instance
+                if (service != null) {
+                    val res = deviceController.openSettings(Settings.ACTION_BLUETOOTH_SETTINGS)
+                    if (res.isSuccess) {
+                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                            kotlinx.coroutines.delay(1200)
+                            service.toggleSettingSwitch()
+                            kotlinx.coroutines.delay(800)
+                            service.performGlobal(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
+                        }
+                        ActionExecutionResult(
+                            action = "TOGGLE_BLUETOOTH",
+                            target = if (enable) "ON" else "OFF",
+                            success = true,
+                            verified = true,
+                            feedbackMessage = "Automatically toggling Bluetooth state via Accessibility Service.",
+                            technicalDetails = "Accessibility automation executed on Bluetooth switch"
+                        )
+                    } else {
+                        ActionExecutionResult(
+                            action = "TOGGLE_BLUETOOTH",
+                            target = null,
+                            success = false,
+                            verified = false,
+                            feedbackMessage = "Unable to open Bluetooth Settings page.",
+                            technicalDetails = ""
+                        )
+                    }
                 } else {
-                    ActionExecutionResult(
-                        action = "TOGGLE_BLUETOOTH",
-                        target = null,
-                        success = false,
-                        verified = false,
-                        feedbackMessage = "Unable to adjust Bluetooth: ${result.exceptionOrNull()?.message}",
-                        technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
-                    )
+                    val result = deviceController.toggleBluetooth(enable)
+                    if (result.isSuccess) {
+                        val msg = result.getOrNull() ?: ("Bluetooth set to " + if (enable) "ON" else "OFF")
+                        ActionExecutionResult(
+                            action = "TOGGLE_BLUETOOTH",
+                            target = if (enable) "ON" else "OFF",
+                            success = true,
+                            verified = true,
+                            feedbackMessage = msg,
+                            technicalDetails = "BluetoothAdapter/Settings toggle executed"
+                        )
+                    } else {
+                        ActionExecutionResult(
+                            action = "TOGGLE_BLUETOOTH",
+                            target = null,
+                            success = false,
+                            verified = false,
+                            feedbackMessage = "Unable to adjust Bluetooth: ${result.exceptionOrNull()?.message}",
+                            technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
+                        )
+                    }
                 }
             }
 

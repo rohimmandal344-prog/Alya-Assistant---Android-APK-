@@ -35,6 +35,20 @@ enum class ActionImpactLevel {
     HIGH_IMPACT
 }
 
+enum class CompanionCharacterState {
+    IDLE,
+    TALKING,
+    FALLING,
+    RUNNING,
+    APP_LAUNCH,
+    DRINKING_COFFEE,
+    STRETCHING,
+    WALKING,
+    SITTING,
+    ANGRY_POUT,
+    HURT
+}
+
 enum class CapabilityState {
     GRANTED,
     AVAILABLE,
@@ -76,6 +90,7 @@ enum class DeviceActionType {
     GET_DEVICE_INFO,
     GET_SYSTEM_METRICS,
     AUTO_DIM_SCREEN,
+    SET_SCREEN_BRIGHTNESS,
     TOGGLE_BLUETOOTH,
     SET_DO_NOT_DISTURB,
     GET_BATTERY_STATUS,

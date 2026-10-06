@@ -18,8 +18,11 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -66,19 +69,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.R
+import com.example.core.model.CompanionCharacterState
 import com.example.core.model.VoiceState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-
-enum class CompanionCharacterState {
-    IDLE,
-    TALKING,
-    FALLING,
-    RUNNING,
-    APP_LAUNCH
-}
 
 @Composable
 fun AlyaScreenCompanionOverlay(
@@ -95,6 +92,13 @@ fun AlyaScreenCompanionOverlay(
 
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+    val companionWidthPx = with(density) { 130.dp.toPx() }
+    val companionHeightPx = with(density) { 170.dp.toPx() }
+
+    val velocityTracker = remember { VelocityTracker() }
 
     // Physics Animation States
     val offsetX = remember { Animatable(180f) }
@@ -103,7 +107,20 @@ fun AlyaScreenCompanionOverlay(
     val characterScale = remember { Animatable(1f) }
 
     var isDragging by remember { mutableStateOf(false) }
+    val serviceState by com.example.service.AlyaForegroundService.currentCompanionState.collectAsStateWithLifecycle()
     var currentCharacterState by remember { mutableStateOf(CompanionCharacterState.IDLE) }
+    
+    // Sync local state to Service state for system consistency
+    LaunchedEffect(serviceState) {
+        if (!isDragging) {
+            currentCharacterState = serviceState
+        }
+    }
+
+    // Sync local state back to Service if user triggers state change (e.g. via drag/tap)
+    LaunchedEffect(currentCharacterState) {
+        com.example.service.AlyaForegroundService.updateCompanionState(currentCharacterState)
+    }
     var speechBubbleText by remember { mutableStateOf<String?>(null) }
     var showQuickMenu by remember { mutableStateOf(false) }
 
@@ -130,31 +147,39 @@ fun AlyaScreenCompanionOverlay(
         label = "lip_sync_loop"
     )
 
-    // Sync character state with assistant speech
-    LaunchedEffect(voiceState, companionStateTrigger) {
-        when {
-            voiceState == VoiceState.SPEAKING -> {
-                currentCharacterState = CompanionCharacterState.TALKING
-                speechBubbleText = latestAssistantText?.take(65)
+    // Reactive Sync: character state with assistant speech & speech bubble text
+    LaunchedEffect(voiceState, currentCharacterState) {
+        if (voiceState == VoiceState.SPEAKING) {
+            currentCharacterState = CompanionCharacterState.TALKING
+            speechBubbleText = latestAssistantText?.take(65)
+        } else {
+            // Update speech bubble based on current autonomous state
+            speechBubbleText = when (currentCharacterState) {
+                CompanionCharacterState.TALKING -> null
+                CompanionCharacterState.DRINKING_COFFEE -> "Sip sip... Ah, ☕✨"
+                CompanionCharacterState.STRETCHING -> "Stretch~ 🧘‍♀️💫"
+                CompanionCharacterState.WALKING -> if (currentCharacterState == CompanionCharacterState.WALKING) "Let's explore! 👉" else null
+                CompanionCharacterState.SITTING -> "Taking a break... 🎀"
+                CompanionCharacterState.APP_LAUNCH -> "Opening app for you! ✨"
+                CompanionCharacterState.HURT -> "Arre! संभल के! 😲"
+                CompanionCharacterState.ANGRY_POUT -> "Baka! धक्का क्यों दिया? 💢"
+                else -> if (voiceState == VoiceState.IDLE && !isDragging) null else speechBubbleText
             }
-            companionStateTrigger.equals("RUNNING", ignoreCase = true) -> {
-                currentCharacterState = CompanionCharacterState.RUNNING
-                speechBubbleText = "Going fast! 🏃‍♀️💨"
-            }
-            companionStateTrigger.equals("FALLING", ignoreCase = true) -> {
-                currentCharacterState = CompanionCharacterState.FALLING
-            }
-            companionStateTrigger.equals("APP_LAUNCH", ignoreCase = true) -> {
-                currentCharacterState = CompanionCharacterState.APP_LAUNCH
-                speechBubbleText = "Opening app for you! ✨"
-                delay(2200)
-                currentCharacterState = CompanionCharacterState.IDLE
-            }
-            else -> {
-                if (!isDragging && currentCharacterState != CompanionCharacterState.FALLING) {
-                    currentCharacterState = CompanionCharacterState.IDLE
-                }
-            }
+        }
+    }
+
+    // Handle special movement for Walking state in Compose
+    LaunchedEffect(currentCharacterState) {
+        if (currentCharacterState == CompanionCharacterState.WALKING && !isDragging) {
+            val targetX = (20..((screenWidthPx - companionWidthPx - 20).toInt().coerceAtLeast(21))).random().toFloat()
+            offsetX.animateTo(
+                targetValue = targetX,
+                animationSpec = tween(
+                    durationMillis = (Math.abs(targetX - offsetX.value) * 8).toInt().coerceIn(1200, 5000),
+                    easing = LinearEasing
+                )
+            )
+            com.example.service.AlyaForegroundService.updateCompanionState(CompanionCharacterState.IDLE)
         }
     }
 
@@ -163,23 +188,36 @@ fun AlyaScreenCompanionOverlay(
             .fillMaxSize()
             .testTag("alya_screen_companion_overlay")
     ) {
-        val screenWidthPx = with(density) { maxWidth.toPx() }
-        val screenHeightPx = with(density) { maxHeight.toPx() }
-        val companionWidthPx = with(density) { 130.dp.toPx() }
-        val companionHeightPx = with(density) { 170.dp.toPx() }
-
-        // Trigger Fall / Gravity Physics
-        fun triggerFallGravity(initialVelocityY: Float = 600f) {
+        // Trigger Fall / Gravity Physics with Momentum and Personality Reactions
+        fun triggerFallGravity(isHurt: Boolean = false, initialVelocityX: Float = 0f, initialVelocityY: Float = 0f) {
             scope.launch {
-                currentCharacterState = CompanionCharacterState.FALLING
-                speechBubbleText = "Kya kar rahe ho, baka! Kyaa~?! 😲"
+                if (isHurt) {
+                    currentCharacterState = CompanionCharacterState.HURT
+                    speechBubbleText = listOf("Arre! 😲", "Hey! Watch it!", "Kya kar rahe ho?! 💢").random()
+                } else {
+                    currentCharacterState = CompanionCharacterState.FALLING
+                    speechBubbleText = "Kya kar rahe ho, baka! Kyaa~?! 😲"
+                }
                 
-                // Tumbling rotation during fall
+                // Tumbling rotation based on lateral momentum
                 launch {
+                    val targetRotation = if (initialVelocityX > 200f) 50f else if (initialVelocityX < -200f) -50f else if (offsetX.value > screenWidthPx / 2) 45f else -45f
                     rotationAngle.animateTo(
-                        targetValue = if (offsetX.value > screenWidthPx / 2) 28f else -28f,
-                        animationSpec = tween(300, easing = FastOutSlowInEasing)
+                        targetValue = targetRotation,
+                        animationSpec = tween(400, easing = FastOutSlowInEasing)
                     )
+                }
+
+                // Momentum Fling / Decay Phase
+                if (Math.abs(initialVelocityX) > 100f || Math.abs(initialVelocityY) > 100f) {
+                    launch {
+                        offsetX.animateDecay(initialVelocityX, exponentialDecay())
+                    }
+                    launch {
+                        offsetY.animateDecay(initialVelocityY, exponentialDecay())
+                    }
+                    // Wait for momentum to dissipate slightly before gravity takes over
+                    delay(300)
                 }
 
                 // Gravity pull to bottom edge
@@ -192,19 +230,21 @@ fun AlyaScreenCompanionOverlay(
                     )
                 )
 
-                // Landing recovery bounce
-                rotationAngle.animateTo(
-                    targetValue = 0f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                )
+                // Landing recovery
+                if (isHurt) {
+                    currentCharacterState = CompanionCharacterState.ANGRY_POUT
+                    speechBubbleText = "संभल के! मैं गिर जाती अभी... जानबूझकर किया न तुमने? 😡"
+                    rotationAngle.animateTo(0f, spring(Spring.DampingRatioLowBouncy))
+                    delay(4000)
+                } else {
+                    rotationAngle.animateTo(0f, spring(Spring.DampingRatioMediumBouncy))
+                    currentCharacterState = CompanionCharacterState.IDLE
+                    speechBubbleText = "Ouch! संभल के करो ना! 💢"
+                    delay(2500)
+                }
                 
-                currentCharacterState = CompanionCharacterState.IDLE
-                speechBubbleText = "Ouch! संभल के करो ना! 💢"
-                delay(2200)
-                if (speechBubbleText?.contains("Ouch") == true) {
+                if (!isDragging && voiceState == VoiceState.IDLE) {
+                    currentCharacterState = CompanionCharacterState.IDLE
                     speechBubbleText = null
                 }
             }
@@ -219,16 +259,28 @@ fun AlyaScreenCompanionOverlay(
                     )
                 }
                 .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = {
+                            triggerFallGravity(isHurt = true)
+                        },
+                        onTap = {
+                            showQuickMenu = !showQuickMenu
+                            onTapCompanion()
+                        }
+                    )
+                }
+                .pointerInput(Unit) {
                     detectDragGestures(
                         onDragStart = {
                             isDragging = true
                             currentCharacterState = CompanionCharacterState.FALLING
                             speechBubbleText = "Hey! Mujhe kahan le jaa rahe ho? 🎀"
+                            velocityTracker.resetTracking()
                         },
                         onDragEnd = {
                             isDragging = false
-                            // User pushed or released Alya — trigger physics gravity drop
-                            triggerFallGravity()
+                            val velocity = velocityTracker.calculateVelocity()
+                            triggerFallGravity(isHurt = false, initialVelocityX = velocity.x, initialVelocityY = velocity.y)
                         },
                         onDragCancel = {
                             isDragging = false
@@ -236,12 +288,13 @@ fun AlyaScreenCompanionOverlay(
                         },
                         onDrag = { change, dragAmount ->
                             change.consume()
+                            velocityTracker.addPosition(change.uptimeMillis, change.position)
                             scope.launch {
-                                val newX = (offsetX.value + dragAmount.x).coerceIn(0f, screenWidthPx - companionWidthPx)
-                                val newY = (offsetY.value + dragAmount.y).coerceIn(40f, screenHeightPx - companionHeightPx)
+                                val newX = (offsetX.value + dragAmount.x).coerceIn(-50f, screenWidthPx - companionWidthPx + 50f)
+                                val newY = (offsetY.value + dragAmount.y).coerceIn(-50f, screenHeightPx - companionHeightPx + 50f)
                                 offsetX.snapTo(newX)
                                 offsetY.snapTo(newY)
-                                rotationAngle.snapTo((dragAmount.x * 0.8f).coerceIn(-35f, 35f))
+                                rotationAngle.snapTo((dragAmount.x * 1.2f).coerceIn(-40f, 40f))
                             }
                         }
                     )
@@ -280,14 +333,7 @@ fun AlyaScreenCompanionOverlay(
                     modifier = Modifier
                         .size(width = 130.dp, height = 170.dp)
                         .rotate(rotationAngle.value)
-                        .scale(characterScale.value)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            showQuickMenu = !showQuickMenu
-                            onTapCompanion()
-                        },
+                        .scale(characterScale.value),
                     contentAlignment = Alignment.Center
                 ) {
                     // High-performance SpriteSheetAnimator with smooth frame transitions & state bobs
@@ -345,7 +391,7 @@ fun AlyaScreenCompanionOverlay(
                             IconButton(
                                 onClick = {
                                     showQuickMenu = false
-                                    triggerFallGravity(900f)
+                                    triggerFallGravity(isHurt = false)
                                 },
                                 modifier = Modifier.size(28.dp)
                             ) {

@@ -204,6 +204,30 @@ class DeviceController(private val context: Context) {
     }
 
     /**
+     * Sets explicit system screen brightness level (0 to 100 percentage)
+     */
+    fun setScreenBrightness(percentage: Int): Result<String> {
+        return try {
+            val clamped = percentage.coerceIn(0, 100)
+            val value = (clamped * 255) / 100
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
+                Settings.System.putInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS, value)
+                AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Explicitly set screen brightness to $clamped%")
+                Result.success("Screen brightness set to $clamped%")
+            } else {
+                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    data = Uri.parse("package:" + context.packageName)
+                }
+                context.startActivity(intent)
+                Result.success("Write Settings permission required. Prompted user to authorize.")
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Toggles Bluetooth or directs user to Bluetooth settings depending on Android API level and permissions.
      */
     fun toggleBluetooth(enable: Boolean): Result<String> {

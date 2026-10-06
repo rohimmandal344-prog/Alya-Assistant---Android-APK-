@@ -1,8 +1,13 @@
 package com.example.orchestrator
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import com.example.ai.GeminiApiClient
 import com.example.ai.GeminiLiveClient
+import com.example.audio.AlyaAudioProcessor
 import com.example.audio.SpeechRecognizerHelper
 import com.example.audio.TtsManager
 import com.example.audio.VoiceController
@@ -54,6 +59,7 @@ class AssistantOrchestrator(
     val ttsManager = TtsManager(context)
     val voiceController = VoiceController(context)
     val geminiApiClient = GeminiApiClient()
+    val audioProcessor = AlyaAudioProcessor()
     val geminiActionHandler = com.example.ai.GeminiActionHandler(context, capabilityRegistry)
 
     private val sendMutex = Mutex()
@@ -97,6 +103,10 @@ class AssistantOrchestrator(
             if (isFinal) {
                 scope.launch { processUserInput(transcript, speakResponse = true) }
             }
+        },
+        onToolCall = { name, args ->
+            val result = geminiActionHandler.executeFunctionCall(com.example.ai.GeminiFunctionCall(name, args))
+            Pair(result.success, result.feedbackMessage)
         }
     )
 
@@ -325,8 +335,7 @@ class AssistantOrchestrator(
 
                     // Process function calls if model requested system controls
                     if (payload.functionCalls.isNotEmpty()) {
-                        companionTriggerFlow.value = "APP_LAUNCH"
-                        companionExpressionFlow.value = "happy"
+                        AlyaForegroundService.updateCompanionState(CompanionCharacterState.APP_LAUNCH)
 
                         for (fnCall in payload.functionCalls) {
                             val actionRes = geminiActionHandler.executeFunctionCall(fnCall)
@@ -508,17 +517,45 @@ class AssistantOrchestrator(
     fun startLiveVoiceMode() {
         AlyaLogger.i(TAG, "Entering Live Voice Mode (Background Active)")
         _isLiveActive.value = true
-        AlyaForegroundService.startService(context, "Alya is listening in the background…")
-        liveClient.startLiveSession()
-        speechRecognizerHelper.startListening()
+
+        // Explicit SYSTEM_ALERT_WINDOW permission check and request logic for home screen overlay
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+            try {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:${context.packageName}")
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+                AlyaLogger.w(TAG, "SYSTEM_ALERT_WINDOW permission not granted. Prompting user to authorize overlay.")
+            } catch (e: Exception) {
+                AlyaLogger.e(TAG, "Failed to prompt for overlay permission", e)
+            }
+        }
+
+        AlyaForegroundService.startService(context, "Alya is active in the background")
+        AlyaForegroundService.showOverlayAction(context)
+        
+        scope.launch {
+            val key = preferencesManager.customApiKey.first()
+            liveClient.startLiveSession(key, audioProcessor)
+            
+            // Continuous zero-noise 24kHz Mono mic capture
+            audioProcessor.startRecording { cleanBytes, _ ->
+                liveClient.sendAudioChunk(cleanBytes)
+            }
+        }
     }
 
     fun stopLiveVoiceMode() {
         AlyaLogger.i(TAG, "Exiting Live Voice Mode")
         _isLiveActive.value = false
-        speechRecognizerHelper.stopListening()
+        audioProcessor.stopRecording()
+        audioProcessor.stopProcessing()
         liveClient.stopLiveSession()
         ttsManager.stop()
+        AlyaForegroundService.hideOverlayAction(context)
         AlyaForegroundService.stopService(context)
         _voiceState.value = VoiceState.IDLE
     }

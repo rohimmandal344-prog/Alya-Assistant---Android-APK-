@@ -102,6 +102,14 @@ class GeminiActionHandler(
                             impactLevel = ActionImpactLevel.SAFE
                         )
                     }
+                    "brightness", "screen_brightness", "screen brightness", "lightness" -> {
+                        val level = args["level"]?.toString()?.toIntOrNull() ?: (if (state) 70 else 15)
+                        ActionIntent(
+                            action = DeviceActionType.SET_SCREEN_BRIGHTNESS,
+                            parameters = mapOf("level" to level.toString()),
+                            impactLevel = ActionImpactLevel.SAFE
+                        )
+                    }
                     "dnd", "do_not_disturb", "donotdisturb", "silent" -> {
                         ActionIntent(
                             action = DeviceActionType.SET_DO_NOT_DISTURB,

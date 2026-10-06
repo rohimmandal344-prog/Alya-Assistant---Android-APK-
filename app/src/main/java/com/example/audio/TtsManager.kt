@@ -75,13 +75,11 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
         tts = TextToSpeech(context.applicationContext, this)
     }
 
-    private var onCurrentSpeechCompleted: (() -> Unit)? = null
-
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             applyLanguage(currentLanguageTag)
-            tts?.setPitch(1.05f)
-            tts?.setSpeechRate(1.0f)
+            tts?.setPitch(currentPitch)
+            tts?.setSpeechRate(currentRate)
 
             // Select natural female voice if available
             try {
@@ -92,8 +90,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                                 (voice.name.contains("female", ignoreCase = true) ||
                                         voice.name.contains("en-us-x-sfg", ignoreCase = true) ||
                                         voice.name.contains("en-us-x-iol", ignoreCase = true) ||
-                                        voice.name.contains("hi-in-x-hie", ignoreCase = true) ||
-                                        voice.name.contains("hi-in-x-hic", ignoreCase = true) ||
                                         voice.name.contains("en-us-x-tpf", ignoreCase = true))
                     }
                     if (femaleVoice != null) {
@@ -116,9 +112,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                     _speakingMessageId.value = null
                     releaseAudioFocus()
                     AlyaLogger.d(TAG, "TTS finished utterance: $utteranceId")
-                    val cb = onCurrentSpeechCompleted
-                    onCurrentSpeechCompleted = null
-                    cb?.invoke()
                 }
 
                 @Deprecated("Deprecated in Java")
@@ -127,9 +120,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                     _speakingMessageId.value = null
                     releaseAudioFocus()
                     AlyaLogger.e(TAG, "TTS error on utterance: $utteranceId")
-                    val cb = onCurrentSpeechCompleted
-                    onCurrentSpeechCompleted = null
-                    cb?.invoke()
                 }
 
                 override fun onError(utteranceId: String?, errorCode: Int) {
@@ -137,9 +127,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                     _speakingMessageId.value = null
                     releaseAudioFocus()
                     AlyaLogger.e(TAG, "TTS error $errorCode on utterance: $utteranceId")
-                    val cb = onCurrentSpeechCompleted
-                    onCurrentSpeechCompleted = null
-                    cb?.invoke()
                 }
             })
 
@@ -152,13 +139,23 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun setLanguage(languageTag: String) {
-        currentLanguageTag = languageTag
-        applyLanguage(languageTag)
+        val resolvedTag = when {
+            languageTag.equals("rjs-IN", ignoreCase = true) -> "bn-IN"
+            languageTag.equals("bn-BD", ignoreCase = true) -> "bn-IN"
+            else -> languageTag
+        }
+        currentLanguageTag = resolvedTag
+        applyLanguage(resolvedTag)
     }
 
     private fun applyLanguage(languageTag: String) {
         try {
-            val locale = Locale.forLanguageTag(languageTag)
+            val resolvedTag = when {
+                languageTag.equals("rjs-IN", ignoreCase = true) -> "bn-IN"
+                languageTag.equals("bn-BD", ignoreCase = true) -> "bn-IN"
+                else -> languageTag
+            }
+            val locale = Locale.forLanguageTag(resolvedTag)
             val result = tts?.setLanguage(locale)
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 AlyaLogger.w(TAG, "Language $languageTag not fully supported in system TTS, using fallback")
@@ -200,13 +197,9 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
             .replace(Regex("\\[pause:?[^\\]]*\\]", RegexOption.IGNORE_CASE), ", ")
             .replace(Regex("\\[[^\\]]+\\]"), "")
             .trim()
-        if (cleanText.isEmpty()) {
-            onComplete?.invoke()
-            return
-        }
+        if (cleanText.isEmpty()) return
 
         stop() // Prevent overlapping speech
-        onCurrentSpeechCompleted = onComplete
 
         val apiKey = if (!customApiKey.isNullOrBlank()) {
             customApiKey.trim()
@@ -218,6 +211,7 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
             if (apiKey.isNotBlank() && apiKey != "MY_GEMINI_API_KEY") {
                 val geminiSuccess = tryGeminiTtsPlayback(cleanText, apiKey)
                 if (geminiSuccess) {
+                    onComplete?.invoke()
                     return@launch
                 }
             }
@@ -226,26 +220,12 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
             withContext(Dispatchers.Main) {
                 speakOnDevice(cleanText)
             }
+            onComplete?.invoke()
         }
-    }
-
-    val streamPrecacher = StreamTtsPrecacher(context, scope)
-
-    fun onFirstTokensArrived(tokenChunk: String, customApiKey: String? = null) {
-        streamPrecacher.onFirstTokensArrived(tokenChunk, customApiKey)
     }
 
     private suspend fun tryGeminiTtsPlayback(text: String, apiKey: String): Boolean = withContext(Dispatchers.IO) {
         try {
-            // Check if initial audio response was pre-cached during token streaming
-            val cachedFile = streamPrecacher.consumePrecachedAudio(text)
-            if (cachedFile != null && cachedFile.exists() && cachedFile.length() > 0) {
-                withContext(Dispatchers.Main) {
-                    playAudioFile(cachedFile)
-                }
-                return@withContext true
-            }
-
             val url = "$BASE_URL/$GEMINI_TTS_MODEL:generateContent?key=$apiKey"
             val jsonRoot = JSONObject()
 
@@ -406,9 +386,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                     _speakingMessageId.value = null
                     releaseAudioFocus()
                     file.delete()
-                    val cb = onCurrentSpeechCompleted
-                    onCurrentSpeechCompleted = null
-                    cb?.invoke()
                 }
                 setOnErrorListener { _, what, extra ->
                     _isSpeaking.value = false
@@ -416,9 +393,6 @@ class TtsManager(private val context: Context) : TextToSpeech.OnInitListener {
                     releaseAudioFocus()
                     file.delete()
                     AlyaLogger.w(TAG, "MediaPlayer error: what=$what, extra=$extra")
-                    val cb = onCurrentSpeechCompleted
-                    onCurrentSpeechCompleted = null
-                    cb?.invoke()
                     true
                 }
                 start()

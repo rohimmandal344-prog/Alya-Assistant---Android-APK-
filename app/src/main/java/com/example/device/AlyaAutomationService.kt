@@ -238,4 +238,44 @@ class AlyaAutomationService : AccessibilityService() {
             collectNodeText(child, sb)
         }
     }
+
+    /**
+     * Traverses visible screen nodes via BFS to locate and click any Settings Switch or Toggle widget.
+     */
+    fun toggleSettingSwitch(): Boolean {
+        val root = rootInActiveWindow ?: return false
+        val queue = java.util.LinkedList<AccessibilityNodeInfo>()
+        queue.add(root)
+
+        while (!queue.isEmpty()) {
+            val node = queue.poll() ?: continue
+            val className = node.className?.toString() ?: ""
+            if (className.contains("Switch") || className.contains("ToggleButton") || node.isCheckable) {
+                if (node.isClickable) {
+                    val success = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    _lastActionStatus.value = "Toggled settings switch: $success"
+                    AlyaLogger.i(TAG, "Successfully clicked settings switch via automation")
+                    return success
+                } else {
+                    var parent = node.parent
+                    while (parent != null) {
+                        if (parent.isClickable) {
+                            val success = parent.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                            _lastActionStatus.value = "Toggled settings switch parent: $success"
+                            AlyaLogger.i(TAG, "Successfully clicked parent of settings switch")
+                            return success
+                        }
+                        parent = parent.parent
+                    }
+                }
+            }
+            for (i in 0 until node.childCount) {
+                val child = node.getChild(i)
+                if (child != null) {
+                    queue.add(child)
+                }
+            }
+        }
+        return false
+    }
 }
