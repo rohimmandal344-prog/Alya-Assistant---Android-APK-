@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -36,7 +39,7 @@ jobs:
             base64 -d debug.keystore.base64 > debug.keystore
           fi
           if [ ! -s "debug.keystore" ]; then
-            echo "Generating clean debug.keystore..."
+            echo "Generating fallback debug.keystore..."
             keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
           fi
           ls -lh debug.keystore
@@ -47,37 +50,23 @@ jobs:
             echo "Creating .env from .env.example..."
             cp .env.example .env
           fi
-          # Ensure dummy GEMINI_API_KEY is present so secrets plugin does not fail
           if ! grep -q "GEMINI_API_KEY" .env; then
             echo "GEMINI_API_KEY=dummy_build_key" >> .env
           fi
           cat .env
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
-
-      - name: Ensure gradle wrapper jar exists
-        run: |
-          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "gradle-wrapper.jar missing, downloading or generating wrapper..."
-            gradle wrapper --gradle-version 9.3.1 || true
-          fi
+        run: chmod +x gradlew
 
       - name: Build Debug APK with Gradle
         run: |
-          if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "Building with ./gradlew..."
-            ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
-          else
-            echo "Building with system gradle..."
-            gradle assembleDebug --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
-          fi
+          ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
 
       - name: Locate Generated APK
         run: |
           mkdir -p .build-outputs
+          find app/build/outputs/apk/debug -type f -name "*.apk" -exec cp {} .build-outputs/ \; 2>/dev/null || true
           find . -type f -name "*.apk" -not -path "*/.*/*" -exec cp {} .build-outputs/ \; || true
-          find app/build/outputs/apk -type f -name "*.apk" -exec cp {} .build-outputs/ \; 2>/dev/null || true
           echo "Build outputs:"
           ls -lh .build-outputs/
 
@@ -87,4 +76,4 @@ jobs:
           name: alya-assistant-debug-apk
           path: .build-outputs/*.apk
           retention-days: 14
-          if-no-files-found: warn
+          if-no-files-found: error
