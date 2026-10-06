@@ -1,0 +1,157 @@
+name: Production Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Release Tag / Version (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+      release_title:
+        description: 'Release Title'
+        required: false
+        default: 'Alya Assistant Production Release'
+      is_draft:
+        description: 'Create as Draft Release'
+        type: boolean
+        required: false
+        default: false
+      is_prerelease:
+        description: 'Mark as Pre-release'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release-apk:
+    name: Build & Publish Production APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Prepare Signing Keystore
+        id: keystore
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 || secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD_SECRET: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD_SECRET: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          STORE_PASS="${STORE_PASSWORD_SECRET:-alya_release_pwd_2026}"
+          KEY_PASS="${KEY_PASSWORD_SECRET:-alya_release_pwd_2026}"
+
+          if [ -n "$RELEASE_KEYSTORE_BASE64" ]; then
+            echo "Decoding release keystore from repository secrets..."
+            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > my-upload-key.jks
+          elif [ ! -f "my-upload-key.jks" ]; then
+            echo "Generating production release signing key..."
+            keytool -genkeypair -v -keystore my-upload-key.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 -storepass "$STORE_PASS" -keypass "$KEY_PASS" -dname "CN=Alya Assistant,OU=Mobile,O=Alya,C=US"
+          fi
+
+          echo "STORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+          echo "KEYSTORE_PATH=${GITHUB_WORKSPACE}/my-upload-key.jks" >> $GITHUB_ENV
+          ls -lh my-upload-key.jks
+
+      - name: Prepare Environment File
+        env:
+          GEMINI_API_KEY_SECRET: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ ! -f ".env" ]; then
+            cp .env.example .env
+          fi
+          if [ -n "$GEMINI_API_KEY_SECRET" ]; then
+            echo "GEMINI_API_KEY=$GEMINI_API_KEY_SECRET" >> .env
+          elif ! grep -q "GEMINI_API_KEY" .env; then
+            echo "GEMINI_API_KEY=dummy_production_key" >> .env
+          fi
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Build Production Release APK
+        env:
+          STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+          KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m"
+        run: |
+          ./gradlew assembleRelease --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
+
+      - name: Prepare Release Asset
+        id: asset
+        run: |
+          mkdir -p release-assets
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" == "main" || "$TAG" == "master" || -z "$TAG" ]]; then
+            TAG="${{ github.event.inputs.version_tag || 'v1.0.0' }}"
+          fi
+
+          RELEASE_APK=$(find app/build/outputs/apk/release -type f -name "*.apk" | head -n 1)
+          if [ -f "$RELEASE_APK" ]; then
+            cp "$RELEASE_APK" "release-assets/Alya-Assistant-${TAG}.apk"
+            echo "Output asset: release-assets/Alya-Assistant-${TAG}.apk"
+          else
+            echo "Error: Release APK not found!" && exit 1
+          fi
+
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+          ls -lh release-assets/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alya-assistant-production-apk
+          path: release-assets/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Attach APK as Release Asset in GitHub
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ github.event.inputs.release_title || format('Alya Assistant {0}', env.RELEASE_TAG) }}
+          body: |
+            ## 🌸 Alya Assistant Production Release ${{ env.RELEASE_TAG }}
+
+            ### ✨ Key Highlights:
+            - **Real-Time Live Voice & Natural Speech Engine** (Gemini Live 24kHz low-latency audio)
+            - **Interactive 2D Anime Sprite Companion Overlay** with smooth idle, talking, and physics drag & fall animations
+            - **Android Device Controller** (Apps, Volume, Bluetooth, DND, Flashlight, Battery telemetry)
+            - **Accessibility Automation Bridge** for direct device actions
+            - **Offline Capability Engine & Local Storage**
+
+            ### 📲 Download APK:
+            Download and install **`Alya-Assistant-${{ env.RELEASE_TAG }}.apk`** directly onto your Android device.
+          draft: ${{ github.event.inputs.is_draft || false }}
+          prerelease: ${{ github.event.inputs.is_prerelease || false }}
+          files: release-assets/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

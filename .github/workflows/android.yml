@@ -92,6 +92,7 @@ jobs:
           STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
           KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m"
         run: |
           ./gradlew testDebugUnitTest --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
 
@@ -100,6 +101,7 @@ jobs:
           STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
           KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m"
         run: |
           ./gradlew assembleDebug assembleRelease --no-daemon --stacktrace -Dorg.gradle.configuration-cache=false
 
