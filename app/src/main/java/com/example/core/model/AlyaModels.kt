@@ -76,6 +76,9 @@ enum class DeviceActionType {
     GET_DEVICE_INFO,
     GET_SYSTEM_METRICS,
     AUTO_DIM_SCREEN,
+    TOGGLE_BLUETOOTH,
+    SET_DO_NOT_DISTURB,
+    GET_BATTERY_STATUS,
     UNKNOWN
 }
 

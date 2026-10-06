@@ -97,7 +97,15 @@ class GeminiActionHandler(
                     }
                     "bluetooth" -> {
                         ActionIntent(
-                            action = DeviceActionType.OPEN_BLUETOOTH_SETTINGS,
+                            action = DeviceActionType.TOGGLE_BLUETOOTH,
+                            parameters = mapOf("enable" to state.toString()),
+                            impactLevel = ActionImpactLevel.SAFE
+                        )
+                    }
+                    "dnd", "do_not_disturb", "donotdisturb", "silent" -> {
+                        ActionIntent(
+                            action = DeviceActionType.SET_DO_NOT_DISTURB,
+                            parameters = mapOf("enable" to state.toString()),
                             impactLevel = ActionImpactLevel.SAFE
                         )
                     }
@@ -108,6 +116,35 @@ class GeminiActionHandler(
                         )
                     }
                 }
+            }
+
+            "toggleBluetooth" -> {
+                val state = args["state"]?.toString()?.toBoolean()
+                    ?: args["enable"]?.toString()?.toBoolean()
+                    ?: true
+                ActionIntent(
+                    action = DeviceActionType.TOGGLE_BLUETOOTH,
+                    parameters = mapOf("enable" to state.toString()),
+                    impactLevel = ActionImpactLevel.SAFE
+                )
+            }
+
+            "setDoNotDisturb" -> {
+                val state = args["state"]?.toString()?.toBoolean()
+                    ?: args["enable"]?.toString()?.toBoolean()
+                    ?: true
+                ActionIntent(
+                    action = DeviceActionType.SET_DO_NOT_DISTURB,
+                    parameters = mapOf("enable" to state.toString()),
+                    impactLevel = ActionImpactLevel.SAFE
+                )
+            }
+
+            "getBatteryStatus", "readBatteryStatus" -> {
+                ActionIntent(
+                    action = DeviceActionType.GET_BATTERY_STATUS,
+                    impactLevel = ActionImpactLevel.SAFE
+                )
             }
 
             "performGlobalAction" -> {

@@ -1,6 +1,9 @@
 package com.example.device
 
 import android.app.ActivityManager
+import android.app.NotificationManager
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -196,6 +199,111 @@ class DeviceController(private val context: Context) {
             }
         } catch (e: Exception) {
             AlyaLogger.e(AlyaLogger.TAG_DEVICE, "Auto-dim screen failed", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Toggles Bluetooth or directs user to Bluetooth settings depending on Android API level and permissions.
+     */
+    fun toggleBluetooth(enable: Boolean): Result<String> {
+        return try {
+            val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+            val adapter = bluetoothManager?.adapter ?: BluetoothAdapter.getDefaultAdapter()
+            if (adapter == null) {
+                return Result.failure(IllegalStateException("No Bluetooth hardware available on this device."))
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Android 12+ requires BLUETOOTH_CONNECT runtime permission; if missing or restricted by platform, open settings panel
+                val hasConnectPerm = ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.BLUETOOTH_CONNECT
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (hasConnectPerm) {
+                    val targetState = if (enable) "enable" else "disable"
+                    val intent = Intent(if (enable) BluetoothAdapter.ACTION_REQUEST_ENABLE else Settings.ACTION_BLUETOOTH_SETTINGS).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                    AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Triggered Bluetooth $targetState intent")
+                    Result.success(if (enable) "Prompted to enable Bluetooth" else "Opened Bluetooth settings to turn off")
+                } else {
+                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                    AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Opened Bluetooth settings for user toggle")
+                    Result.success("Opened Bluetooth settings (toggle to ${if (enable) "ON" else "OFF"})")
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                if (enable) adapter.enable() else adapter.disable()
+                AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Toggled Bluetooth state to $enable")
+                Result.success(if (enable) "Bluetooth turned ON" else "Bluetooth turned OFF")
+            }
+        } catch (e: Exception) {
+            AlyaLogger.e(AlyaLogger.TAG_DEVICE, "Failed to toggle Bluetooth", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Enables or disables Do Not Disturb (DND) / Zen Mode.
+     * Checks NotificationPolicyAccess permission; if not granted, opens system DND permission settings.
+     */
+    fun setDoNotDisturbMode(enable: Boolean): Result<String> {
+        return try {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (notificationManager.isNotificationPolicyAccessGranted) {
+                    val targetFilter = if (enable) {
+                        NotificationManager.INTERRUPTION_FILTER_PRIORITY
+                    } else {
+                        NotificationManager.INTERRUPTION_FILTER_ALL
+                    }
+                    notificationManager.setInterruptionFilter(targetFilter)
+                    AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Set DND interruption filter to $targetFilter")
+                    Result.success(if (enable) "Do Not Disturb mode enabled" else "Do Not Disturb mode disabled")
+                } else {
+                    // Open Notification Policy Access settings so user can grant permission
+                    val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                    AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Prompted user for Notification Policy Access for DND")
+                    Result.success("Opened Do Not Disturb access settings. Please allow Alya to manage DND mode.")
+                }
+            } else {
+                // Fallback for pre-M: adjust ringer mode to silent or normal
+                val ringerMode = if (enable) AudioManager.RINGER_MODE_SILENT else AudioManager.RINGER_MODE_NORMAL
+                audioManager.ringerMode = ringerMode
+                AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Adjusted ringer mode for DND: $ringerMode")
+                Result.success(if (enable) "Ringer set to Silent (DND)" else "Ringer restored to Normal")
+            }
+        } catch (e: Exception) {
+            AlyaLogger.e(AlyaLogger.TAG_DEVICE, "Failed to adjust Do Not Disturb mode", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Reads current battery status and returns a formatted verbal and technical overview.
+     */
+    fun readBatteryStatusDetailed(): Result<String> {
+        return try {
+            val battery = getBatteryInfo()
+            val text = if (battery.levelPercentage >= 0) {
+                val chargingDesc = if (battery.isCharging) "currently charging" else "not charging"
+                "Battery is at ${battery.levelPercentage}%, status: ${battery.status} ($chargingDesc)."
+            } else {
+                "Battery level is currently unavailable."
+            }
+            AlyaLogger.i(AlyaLogger.TAG_DEVICE, "Read battery status: $text")
+            Result.success(text)
+        } catch (e: Exception) {
+            AlyaLogger.e(AlyaLogger.TAG_DEVICE, "Failed reading battery status", e)
             Result.failure(e)
         }
     }

@@ -153,7 +153,35 @@ class CapabilityRegistry(
             )
         }
 
-        // 7. Settings
+        // 7. Settings & System Controls
+        if (text.contains("turn on bluetooth") || text.contains("enable bluetooth") || text.contains("bluetooth on")) {
+            return ActionIntent(
+                action = DeviceActionType.TOGGLE_BLUETOOTH,
+                parameters = mapOf("enable" to "true"),
+                impactLevel = ActionImpactLevel.SAFE
+            )
+        }
+        if (text.contains("turn off bluetooth") || text.contains("disable bluetooth") || text.contains("bluetooth off")) {
+            return ActionIntent(
+                action = DeviceActionType.TOGGLE_BLUETOOTH,
+                parameters = mapOf("enable" to "false"),
+                impactLevel = ActionImpactLevel.SAFE
+            )
+        }
+        if (text.contains("enable do not disturb") || text.contains("turn on do not disturb") || text.contains("dnd on") || text.contains("enable dnd") || text.contains("silent mode on")) {
+            return ActionIntent(
+                action = DeviceActionType.SET_DO_NOT_DISTURB,
+                parameters = mapOf("enable" to "true"),
+                impactLevel = ActionImpactLevel.SAFE
+            )
+        }
+        if (text.contains("disable do not disturb") || text.contains("turn off do not disturb") || text.contains("dnd off") || text.contains("disable dnd") || text.contains("silent mode off")) {
+            return ActionIntent(
+                action = DeviceActionType.SET_DO_NOT_DISTURB,
+                parameters = mapOf("enable" to "false"),
+                impactLevel = ActionImpactLevel.SAFE
+            )
+        }
         if (text.contains("wifi settings") || text.contains("wi-fi settings")) {
             return ActionIntent(
                 action = DeviceActionType.OPEN_WIFI_SETTINGS,
@@ -691,6 +719,80 @@ class CapabilityRegistry(
                     feedbackMessage = msg,
                     technicalDetails = "Metrics retrieved via ActivityManager & StatFs"
                 )
+            }
+
+            DeviceActionType.TOGGLE_BLUETOOTH -> {
+                val enable = intent.parameters["enable"]?.toBoolean() ?: true
+                val result = deviceController.toggleBluetooth(enable)
+                if (result.isSuccess) {
+                    val msg = result.getOrNull() ?: ("Bluetooth set to " + if (enable) "ON" else "OFF")
+                    ActionExecutionResult(
+                        action = "TOGGLE_BLUETOOTH",
+                        target = if (enable) "ON" else "OFF",
+                        success = true,
+                        verified = true,
+                        feedbackMessage = msg,
+                        technicalDetails = "BluetoothAdapter/Settings toggle executed"
+                    )
+                } else {
+                    ActionExecutionResult(
+                        action = "TOGGLE_BLUETOOTH",
+                        target = null,
+                        success = false,
+                        verified = false,
+                        feedbackMessage = "Unable to adjust Bluetooth: ${result.exceptionOrNull()?.message}",
+                        technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
+                    )
+                }
+            }
+
+            DeviceActionType.SET_DO_NOT_DISTURB -> {
+                val enable = intent.parameters["enable"]?.toBoolean() ?: true
+                val result = deviceController.setDoNotDisturbMode(enable)
+                if (result.isSuccess) {
+                    val msg = result.getOrNull() ?: ("Do Not Disturb mode set to " + if (enable) "ON" else "OFF")
+                    ActionExecutionResult(
+                        action = "SET_DO_NOT_DISTURB",
+                        target = if (enable) "ENABLED" else "DISABLED",
+                        success = true,
+                        verified = true,
+                        feedbackMessage = msg,
+                        technicalDetails = "NotificationManager interruption filter updated"
+                    )
+                } else {
+                    ActionExecutionResult(
+                        action = "SET_DO_NOT_DISTURB",
+                        target = null,
+                        success = false,
+                        verified = false,
+                        feedbackMessage = "Unable to adjust Do Not Disturb: ${result.exceptionOrNull()?.message}",
+                        technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
+                    )
+                }
+            }
+
+            DeviceActionType.GET_BATTERY_STATUS -> {
+                val result = deviceController.readBatteryStatusDetailed()
+                if (result.isSuccess) {
+                    val info = deviceController.getBatteryInfo()
+                    ActionExecutionResult(
+                        action = "GET_BATTERY_STATUS",
+                        target = "${info.levelPercentage}%",
+                        success = true,
+                        verified = true,
+                        feedbackMessage = result.getOrNull() ?: "Battery is at ${info.levelPercentage}%",
+                        technicalDetails = "BatteryManager: level=${info.levelPercentage}%, charging=${info.isCharging}, status=${info.status}"
+                    )
+                } else {
+                    ActionExecutionResult(
+                        action = "GET_BATTERY_STATUS",
+                        target = null,
+                        success = false,
+                        verified = false,
+                        feedbackMessage = "Could not retrieve battery status: ${result.exceptionOrNull()?.message}",
+                        technicalDetails = result.exceptionOrNull()?.stackTraceToString() ?: ""
+                    )
+                }
             }
 
             else -> {

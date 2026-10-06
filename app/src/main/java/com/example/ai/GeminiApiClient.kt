@@ -316,6 +316,42 @@ class GeminiApiClient {
                                 put("properties", JSONObject())
                             })
                         })
+                        put(JSONObject().apply {
+                            put("name", "toggleBluetooth")
+                            put("description", "Toggle or change device Bluetooth state (turn on or turn off).")
+                            put("parameters", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("properties", JSONObject().apply {
+                                    put("enable", JSONObject().apply {
+                                        put("type", "BOOLEAN")
+                                        put("description", "True to turn Bluetooth on, false to turn Bluetooth off")
+                                    })
+                                })
+                                put("required", JSONArray().apply { put("enable") })
+                            })
+                        })
+                        put(JSONObject().apply {
+                            put("name", "setDoNotDisturb")
+                            put("description", "Enable or disable Android Do Not Disturb (DND) / Silent mode.")
+                            put("parameters", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("properties", JSONObject().apply {
+                                    put("enable", JSONObject().apply {
+                                        put("type", "BOOLEAN")
+                                        put("description", "True to enable Do Not Disturb mode, false to disable")
+                                    })
+                                })
+                                put("required", JSONArray().apply { put("enable") })
+                            })
+                        })
+                        put(JSONObject().apply {
+                            put("name", "getBatteryStatus")
+                            put("description", "Read current Android battery percentage, charging status, and power state.")
+                            put("parameters", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("properties", JSONObject())
+                            })
+                        })
                     })
                 })
             }

@@ -18,7 +18,10 @@ import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.BatteryChargingFull
+import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.DoNotDisturb
 import androidx.compose.material.icons.filled.FlashlightOff
 import androidx.compose.material.icons.filled.FlashlightOn
 import androidx.compose.material.icons.filled.Home
@@ -138,6 +141,50 @@ fun DeviceControlScreen(
             }
         }
 
+        // Real-Time Battery Status Card
+        item {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (state.batteryInfo?.isCharging == true) Icons.Default.BatteryChargingFull else Icons.Default.BatteryFull,
+                                contentDescription = null,
+                                tint = if (state.batteryInfo?.isCharging == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text("Battery Status", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                                Text(
+                                    text = if (state.batteryInfo != null) {
+                                        "${state.batteryInfo.levelPercentage}% • ${state.batteryInfo.status}"
+                                    } else {
+                                        "Tap to check battery level"
+                                    },
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        OutlinedButton(
+                            onClick = { onQuickAction("battery status") },
+                            modifier = Modifier.testTag("refresh_battery_button")
+                        ) {
+                            Text("Query", fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+        }
+
         // System Settings Shortcuts
         item {
             Card(
@@ -189,6 +236,28 @@ fun DeviceControlScreen(
                             Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text("Notifications", fontSize = 12.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { onQuickAction("turn on bluetooth") },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.Bluetooth, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Toggle BT", fontSize = 12.sp)
+                        }
+                        Button(
+                            onClick = { onQuickAction("enable do not disturb") },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.DoNotDisturb, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Toggle DND", fontSize = 12.sp)
                         }
                     }
                 }
