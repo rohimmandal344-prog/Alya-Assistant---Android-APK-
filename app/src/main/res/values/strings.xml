@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Alya Assistant</string>
+    <string name="accessibility_service_description">Allows Alya Assistant to navigate apps, click buttons, scroll, and type text upon explicit user request.</string>
+    <string name="notification_channel_name">Alya Voice &amp; Automation</string>
+    <string name="notification_channel_desc">Shows active voice session and background assistant status</string>
+    <string name="notification_title">Alya Assistant is active</string>
+    <string name="notification_listening">Listening for commands…</string>
+    <string name="notification_speaking">Alya is speaking…</string>
+</resources>

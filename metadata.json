@@ -1,0 +1,6 @@
+{
+  "name": "Alya Assistant",
+  "description": "Production-grade AI assistant with real-time live voice, natural speech interaction, Android automation, and device control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,276 @@
+[debug] [2026-10-05T19:33:17.773Z] ----------------------------------------------------------------------
+[debug] [2026-10-05T19:33:17.798Z] Command:       /usr/local/bin/node /usr/local/bin/firebase emulators:start --only firestore,auth --project demo-no-project
+[debug] [2026-10-05T19:33:17.799Z] CLI Version:   15.31.0
+[debug] [2026-10-05T19:33:17.799Z] Platform:      linux
+[debug] [2026-10-05T19:33:17.799Z] Node Version:  v22.23.3
+[debug] [2026-10-05T19:33:17.800Z] Detected Agent: unknown
+[debug] [2026-10-05T19:33:17.800Z] Time:          Mon Oct 05 2026 19:33:17 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-10-05T19:33:17.800Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-10-05T19:33:17.838Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-10-05T19:33:20.841Z] openjdk version "21.0.12.1" 2026-08-18 LTS
+OpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)
+
+[debug] [2026-10-05T19:33:20.846Z] Parsed Java major version: 21
+[info] i  emulators: Starting emulators: auth, firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore"}}
+[info] i  emulators: Detected demo project ID "demo-no-project", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail. {"metadata":{"emulator":{"name":"hub"},"message":"Detected demo project ID \"demo-no-project\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail."}}
+[debug] [2026-10-05T19:33:20.854Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-10-05T19:33:20.855Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-10-05T19:33:20.855Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-10-05T19:33:20.855Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-10-05T19:33:20.855Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8085}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-10-05T19:33:20.859Z] Write emulator hub locator at /tmp/hub-demo-no-project.json
+[debug] [2026-10-05T19:33:20.866Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-10-05T19:33:20.866Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2026-10-05T19:33:20.867Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","/opt/firebase-emulators/cloud-firestore-emulator-v1.22.0.jar","--host","127.0.0.1","--port",8085,"--websocket_port",9150,"--database-edition","standard","--project_id","demo-no-project","--rules","/app/applet/firestore.rules","--single_project_mode",true],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","database-edition","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8085} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"/opt/firebase-emulators/cloud-firestore-emulator-v1.22.0.jar\",\"--host\",\"127.0.0.1\",\"--port\",8085,\"--websocket_port\",9150,\"--database-edition\",\"standard\",\"--project_id\",\"demo-no-project\",\"--rules\",\"/app/applet/firestore.rules\",\"--single_project_mode\",true],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"database-edition\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8085}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to firestore-debug.log"}}
+[debug] [2026-10-05T19:33:21.260Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-10-05T19:33:21.260Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-10-05T19:33:23.081Z] Oct 05, 2026 7:33:23 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:33:23 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\nINFO: Started WebSocket server on ws://127.0.0.1:9150\n"}}
+[debug] [2026-10-05T19:33:23.125Z] 
+API endpoint: http:// {"metadata":{"emulator":{"name":"firestore"},"message":"\nAPI endpoint: http://"}}
+[debug] [2026-10-05T19:33:23.126Z] 127.0.0.1:8085
+Database Edition: STANDARD
+Database Mode: CLOUD_FIRESTORE
+
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8085
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8085
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"127.0.0.1:8085\nDatabase Edition: STANDARD\nDatabase Mode: CLOUD_FIRESTORE\n\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8085\n\nIf you are running a Firestore in Datastore Mode project, run:\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8085\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\nDev App Server is now running.\n\n"}}
+[info] ✔  firestore: Firestore Emulator was started in standard edition. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator was started in standard edition."}}
+[info] ✔  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[debug] [2026-10-05T19:33:32.791Z] Oct 05, 2026 7:33:23 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:24 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:26 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Oct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:30 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Oct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Oct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:33:23 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:24 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:26 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\nOct 05, 2026 7:33:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:30 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nOct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\nOct 05, 2026 7:33:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[info] i  ui: downloading ui-v1.15.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.15.0.zip..."}}
+[debug] [2026-10-05T19:33:32.799Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 
+[debug] [2026-10-05T19:33:32.933Z] Oct 05, 2026 7:33:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:33:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-10-05T19:33:32.976Z] Oct 05, 2026 7:33:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:33:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-10-05T19:33:33.133Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 200
+[debug] [2026-10-05T19:33:33.134Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip [stream]
+[debug] [2026-10-05T19:33:34.817Z] Data is 3538469
+[debug] [2026-10-05T19:33:34.817Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.817Z] [unzip] Processing entry: client/
+[debug] [2026-10-05T19:33:34.817Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/client/
+[debug] [2026-10-05T19:33:34.818Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2026-10-05T19:33:34.818Z] [unzip] Processing entry: client/favicon-16x16.png
+[debug] [2026-10-05T19:33:34.818Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.818Z] [unzip] Writing file: /opt/firebase-emulators/ui-v1.15.0/client/favicon-16x16.png
+[debug] [2026-10-05T19:33:34.819Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2026-10-05T19:33:34.819Z] [unzip] Processing entry: client/safari-pinned-tab.svg
+[debug] [2026-10-05T19:33:34.819Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.820Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/safari-pinned-tab.svg
+[debug] [2026-10-05T19:33:34.825Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2026-10-05T19:33:34.825Z] [unzip] Processing entry: client/favicon.ico
+[debug] [2026-10-05T19:33:34.825Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.826Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/favicon.ico
+[debug] [2026-10-05T19:33:34.827Z] [unzip] Entry: client/index.html (compressed_size=1364 bytes, uncompressed_size=3071 bytes)
+[debug] [2026-10-05T19:33:34.827Z] [unzip] Processing entry: client/index.html
+[debug] [2026-10-05T19:33:34.827Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.827Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/index.html
+[debug] [2026-10-05T19:33:34.828Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2026-10-05T19:33:34.829Z] [unzip] Processing entry: client/android-chrome-192x192.png
+[debug] [2026-10-05T19:33:34.829Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.829Z] [unzip] Writing file: /opt/firebase-emulators/ui-v1.15.0/client/android-chrome-192x192.png
+[debug] [2026-10-05T19:33:34.830Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2026-10-05T19:33:34.830Z] [unzip] Processing entry: client/apple-touch-icon.png
+[debug] [2026-10-05T19:33:34.830Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.830Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/apple-touch-icon.png
+[debug] [2026-10-05T19:33:34.831Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2026-10-05T19:33:34.831Z] [unzip] Processing entry: client/android-chrome-512x512.png
+[debug] [2026-10-05T19:33:34.832Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.832Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/android-chrome-512x512.png
+[debug] [2026-10-05T19:33:34.833Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2026-10-05T19:33:34.833Z] [unzip] Processing entry: client/manifest.json
+[debug] [2026-10-05T19:33:34.833Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.833Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/manifest.json
+[debug] [2026-10-05T19:33:34.834Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2026-10-05T19:33:34.835Z] [unzip] Processing entry: client/robots.txt
+[debug] [2026-10-05T19:33:34.835Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.835Z] [unzip] Writing file: /opt/firebase-emulators/ui-v1.15.0/client/robots.txt
+[debug] [2026-10-05T19:33:34.835Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2026-10-05T19:33:34.835Z] [unzip] Processing entry: client/mstile-150x150.png
+[debug] [2026-10-05T19:33:34.835Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.836Z] [unzip] Writing file: /opt/firebase-emulators/ui-v1.15.0/client/mstile-150x150.png
+[debug] [2026-10-05T19:33:34.836Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.836Z] [unzip] Processing entry: client/assets/
+[debug] [2026-10-05T19:33:34.836Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/
+[debug] [2026-10-05T19:33:34.837Z] [unzip] Entry: client/assets/index-BX-A56oj.js (compressed_size=582089 bytes, uncompressed_size=2092775 bytes)
+[debug] [2026-10-05T19:33:34.837Z] [unzip] Processing entry: client/assets/index-BX-A56oj.js
+[debug] [2026-10-05T19:33:34.837Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets
+[debug] [2026-10-05T19:33:34.837Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/index-BX-A56oj.js
+[debug] [2026-10-05T19:33:34.860Z] [unzip] Entry: client/assets/index-CjB9C900.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2026-10-05T19:33:34.860Z] [unzip] Processing entry: client/assets/index-CjB9C900.css
+[debug] [2026-10-05T19:33:34.860Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets
+[debug] [2026-10-05T19:33:34.860Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/index-CjB9C900.css
+[debug] [2026-10-05T19:33:34.864Z] [unzip] Entry: client/assets/index-BX-A56oj.js.map (compressed_size=2362482 bytes, uncompressed_size=10036679 bytes)
+[debug] [2026-10-05T19:33:34.864Z] [unzip] Processing entry: client/assets/index-BX-A56oj.js.map
+[debug] [2026-10-05T19:33:34.864Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets
+[debug] [2026-10-05T19:33:34.864Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/index-BX-A56oj.js.map
+[debug] [2026-10-05T19:33:34.967Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.967Z] [unzip] Processing entry: client/assets/extensions/
+[debug] [2026-10-05T19:33:34.967Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/extensions/
+[debug] [2026-10-05T19:33:34.967Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2026-10-05T19:33:34.967Z] [unzip] Processing entry: client/assets/extensions/default-extension.png
+[debug] [2026-10-05T19:33:34.967Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/extensions
+[debug] [2026-10-05T19:33:34.967Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/extensions/default-extension.png
+[debug] [2026-10-05T19:33:34.968Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.969Z] [unzip] Processing entry: client/assets/img/
+[debug] [2026-10-05T19:33:34.969Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/img/
+[debug] [2026-10-05T19:33:34.969Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2026-10-05T19:33:34.969Z] [unzip] Processing entry: client/assets/img/database.png
+[debug] [2026-10-05T19:33:34.969Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/img
+[debug] [2026-10-05T19:33:34.969Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/img/database.png
+[debug] [2026-10-05T19:33:34.970Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.970Z] [unzip] Processing entry: client/assets/provider-icons/
+[debug] [2026-10-05T19:33:34.970Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/
+[debug] [2026-10-05T19:33:34.971Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2026-10-05T19:33:34.971Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_saml.svg
+[debug] [2026-10-05T19:33:34.971Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.971Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_saml.svg
+[debug] [2026-10-05T19:33:34.972Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2026-10-05T19:33:34.972Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_phone.svg
+[debug] [2026-10-05T19:33:34.972Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.972Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_phone.svg
+[debug] [2026-10-05T19:33:34.973Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2026-10-05T19:33:34.973Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_facebook.svg
+[debug] [2026-10-05T19:33:34.973Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.973Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_facebook.svg
+[debug] [2026-10-05T19:33:34.974Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2026-10-05T19:33:34.974Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_game_center.svg
+[debug] [2026-10-05T19:33:34.975Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.975Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_game_center.svg
+[debug] [2026-10-05T19:33:34.975Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2026-10-05T19:33:34.976Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_apple.svg
+[debug] [2026-10-05T19:33:34.976Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.976Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_apple.svg
+[debug] [2026-10-05T19:33:34.977Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2026-10-05T19:33:34.977Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_github.svg
+[debug] [2026-10-05T19:33:34.977Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.977Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_github.svg
+[debug] [2026-10-05T19:33:34.978Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2026-10-05T19:33:34.978Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_mslive.svg
+[debug] [2026-10-05T19:33:34.978Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.978Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_mslive.svg
+[debug] [2026-10-05T19:33:34.979Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2026-10-05T19:33:34.979Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_yahoo.svg
+[debug] [2026-10-05T19:33:34.979Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.979Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_yahoo.svg
+[debug] [2026-10-05T19:33:34.980Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2026-10-05T19:33:34.980Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_twitter.svg
+[debug] [2026-10-05T19:33:34.980Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.980Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_twitter.svg
+[debug] [2026-10-05T19:33:34.981Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2026-10-05T19:33:34.981Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_play_games.svg
+[debug] [2026-10-05T19:33:34.981Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.981Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_play_games.svg
+[debug] [2026-10-05T19:33:34.982Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2026-10-05T19:33:34.982Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_email.svg
+[debug] [2026-10-05T19:33:34.982Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.983Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_email.svg
+[debug] [2026-10-05T19:33:34.983Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2026-10-05T19:33:34.983Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_google.svg
+[debug] [2026-10-05T19:33:34.983Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.984Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_google.svg
+[debug] [2026-10-05T19:33:34.984Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2026-10-05T19:33:34.984Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_oidc.svg
+[debug] [2026-10-05T19:33:34.984Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-10-05T19:33:34.985Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_oidc.svg
+[debug] [2026-10-05T19:33:34.985Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2026-10-05T19:33:34.985Z] [unzip] Processing entry: client/browserconfig.xml
+[debug] [2026-10-05T19:33:34.985Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.985Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/client/browserconfig.xml
+[debug] [2026-10-05T19:33:34.986Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2026-10-05T19:33:34.986Z] [unzip] Processing entry: client/favicon-32x32.png
+[debug] [2026-10-05T19:33:34.986Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/client
+[debug] [2026-10-05T19:33:34.987Z] [unzip] Writing file: /opt/firebase-emulators/ui-v1.15.0/client/favicon-32x32.png
+[debug] [2026-10-05T19:33:34.987Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-10-05T19:33:34.988Z] [unzip] Processing entry: server/
+[debug] [2026-10-05T19:33:34.988Z] [unzip] mkdir: /opt/firebase-emulators/ui-v1.15.0/server/
+[debug] [2026-10-05T19:33:34.990Z] [unzip] Entry: server/server.mjs.map (compressed_size=217845 bytes, uncompressed_size=944978 bytes)
+[debug] [2026-10-05T19:33:34.990Z] [unzip] Processing entry: server/server.mjs.map
+[debug] [2026-10-05T19:33:34.990Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/server
+[debug] [2026-10-05T19:33:34.990Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/server/server.mjs.map
+[debug] [2026-10-05T19:33:35.001Z] [unzip] Entry: server/server.mjs (compressed_size=276407 bytes, uncompressed_size=933701 bytes)
+[debug] [2026-10-05T19:33:35.001Z] [unzip] Processing entry: server/server.mjs
+[debug] [2026-10-05T19:33:35.001Z] [unzip] else mkdir: /opt/firebase-emulators/ui-v1.15.0/server
+[debug] [2026-10-05T19:33:35.001Z] [unzip] deflating: /opt/firebase-emulators/ui-v1.15.0/server/server.mjs
+[debug] [2026-10-05T19:33:35.019Z] Could not find VSCode notification endpoint: TypeError: fetch failed. If you are not running the Firebase SQL Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ 127.0.0.1:9099 │ http://127.0.0.1:4000/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ 127.0.0.1:8085 │ http://127.0.0.1:4000/firestore │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2026-10-05T19:38:09.185Z] Oct 05, 2026 7:38:09 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:38:09 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T19:47:53.087Z] Oct 05, 2026 7:47:53 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:47:53 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T19:53:30.127Z] Oct 05, 2026 7:53:30 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 7:53:30 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T20:21:49.111Z] Oct 05, 2026 8:21:49 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 8:21:49 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T20:26:19.330Z] Oct 05, 2026 8:26:19 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 8:26:19 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T21:52:34.527Z] Oct 05, 2026 9:52:34 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 9:52:34 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-10-05T22:11:45.945Z] Oct 05, 2026 10:11:45 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Oct 05, 2026 10:11:45 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
